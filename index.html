@@ -1,0 +1,1550 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#1a1a2e">
+    <link rel="manifest" href="manifest.json">
+    <title>Bíblia em 1 Ano - 2026</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        :root {
+            --bg-primary: #1a1a2e;
+            --bg-secondary: #16213e;
+            --accent-primary: #ffd700;
+            --accent-secondary: #ffed4e;
+            --text-primary: #e8e8e8;
+            --text-secondary: #b8b8b8;
+            --card-bg: rgba(255, 255, 255, 0.08);
+        }
+
+        [data-theme="light"] {
+            --bg-primary: #f5f5f5;
+            --bg-secondary: #ffffff;
+            --accent-primary: #ff6b35;
+            --accent-secondary: #ff8c42;
+            --text-primary: #2d3436;
+            --text-secondary: #636e72;
+            --card-bg: rgba(0, 0, 0, 0.05);
+        }
+
+        [data-theme="sepia"] {
+            --bg-primary: #f4e8d0;
+            --bg-secondary: #e8d5b7;
+            --accent-primary: #8b4513;
+            --accent-secondary: #a0522d;
+            --text-primary: #3e2723;
+            --text-secondary: #5d4037;
+            --card-bg: rgba(139, 69, 19, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+            color: var(--text-primary);
+            padding: 10px;
+            min-height: 100vh;
+            transition: all 0.3s ease;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding-bottom: 80px;
+        }
+
+        header {
+            text-align: center;
+            padding: 25px;
+            margin-bottom: 30px;
+            background: var(--card-bg);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        h1 {
+            font-size: 2.2em;
+            color: var(--accent-primary);
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .subtitle {
+            font-size: 1em;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+        }
+
+        .author {
+            font-size: 0.9em;
+            color: var(--accent-primary);
+            font-style: italic;
+            margin-top: 10px;
+        }
+
+        .toolbar {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 0.9em;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            color: var(--bg-primary);
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .theme-buttons {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-top: 15px;
+        }
+
+        .theme-btn {
+            width: 40px;
+            height: 40px;
+            border: 2px solid var(--accent-primary);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .theme-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .theme-dark { background: linear-gradient(135deg, #1a1a2e, #16213e); }
+        .theme-light { background: linear-gradient(135deg, #f5f5f5, #ffffff); }
+        .theme-sepia { background: linear-gradient(135deg, #f4e8d0, #e8d5b7); }
+
+        .progress-container {
+            margin: 20px 0;
+            padding: 20px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 35px;
+            background: rgba(128, 128, 128, 0.2);
+            border-radius: 20px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--bg-primary);
+            font-weight: bold;
+            font-size: 1.1em;
+            transition: width 0.5s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
+        }
+
+        .stat-box {
+            background: rgba(128, 128, 128, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-box:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .stat-number {
+            font-size: 2em;
+            color: var(--accent-primary);
+            font-weight: bold;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            color: var(--text-secondary);
+            margin-top: 8px;
+        }
+
+        .month-section {
+            margin-bottom: 20px;
+            background: var(--card-bg);
+            border-radius: 15px;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .month-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.3s ease;
+        }
+
+        .month-header:hover {
+            background: rgba(255, 215, 0, 0.1);
+        }
+
+        .month-title-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .month-toggle-icon {
+            font-size: 1.3em;
+            color: var(--accent-primary);
+            transition: transform 0.3s ease;
+        }
+
+        .month-section.collapsed .month-toggle-icon {
+            transform: rotate(-90deg);
+        }
+
+        .month-title {
+            font-size: 1.6em;
+            color: var(--accent-primary);
+            margin: 0;
+        }
+
+        .month-progress {
+            font-size: 0.9em;
+            color: var(--text-secondary);
+            background: rgba(128, 128, 128, 0.2);
+            padding: 8px 15px;
+            border-radius: 20px;
+        }
+
+        .month-content {
+            max-height: 10000px;
+            overflow: hidden;
+            transition: max-height 0.4s ease, padding 0.4s ease;
+            padding: 0 20px 20px 20px;
+        }
+
+        .month-section.collapsed .month-content {
+            max-height: 0;
+            padding: 0 20px;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            position: relative;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-primary);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+        }
+
+        .card.completed {
+            background: rgba(255, 215, 0, 0.15);
+            border-color: var(--accent-primary);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .day-label {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: var(--accent-primary);
+        }
+
+        .checkbox-container input[type="checkbox"] {
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            accent-color: var(--accent-primary);
+        }
+
+        .reading-text {
+            font-size: 1.05em;
+            margin-bottom: 15px;
+            line-height: 1.6;
+            color: var(--text-primary);
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .read-button, .note-button {
+            flex: 1;
+            min-width: 120px;
+            padding: 10px 15px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            color: var(--bg-primary);
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+
+        .read-button:hover, .note-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .note-area {
+            margin-top: 15px;
+            display: none;
+        }
+
+        .note-area.active {
+            display: block;
+        }
+
+        .note-textarea {
+            width: 100%;
+            min-height: 80px;
+            padding: 10px;
+            border: 2px solid var(--accent-primary);
+            border-radius: 8px;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 0.9em;
+            resize: vertical;
+        }
+
+        .note-display {
+            background: rgba(255, 215, 0, 0.1);
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 4px solid var(--accent-primary);
+            margin-top: 10px;
+            font-size: 0.95em;
+            line-height: 1.5;
+        }
+
+        .scroll-to-top {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            width: 55px;
+            height: 55px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            color: var(--bg-primary);
+            border: none;
+            border-radius: 50%;
+            font-size: 1.8em;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            opacity: 0;
+            visibility: hidden;
+            z-index: 1000;
+        }
+
+        .scroll-to-top.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .scroll-to-top:hover {
+            transform: translateY(-8px) scale(1.1);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--bg-secondary);
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+            border: 3px solid var(--accent-primary);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .modal-title {
+            font-size: 1.8em;
+            color: var(--accent-primary);
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 2em;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .close-btn:hover {
+            color: var(--accent-primary);
+            transform: rotate(90deg);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin: 20px 0;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 25px;
+            color: var(--text-secondary);
+            font-size: 0.9em;
+            margin-top: 40px;
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 1.6em; }
+            .cards-grid { grid-template-columns: 1fr; }
+            .stats { grid-template-columns: repeat(2, 1fr); }
+            .scroll-to-top {
+                width: 50px;
+                height: 50px;
+                bottom: 20px;
+                right: 20px;
+                font-size: 1.5em;
+            }
+            .card-actions {
+                flex-direction: column;
+            }
+            .read-button, .note-button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📖 Bíblia em 1 Ano - 2026</h1>
+            <p class="subtitle">Plano de Leitura Bíblica Completo</p>
+            <p class="author">Por Josias Ramos da Silva</p>
+
+            <div class="toolbar">
+                <button class="btn" onclick="openNotifications()">🔔 Notificações</button>
+                <button class="btn" onclick="openCharts()">📊 Gráficos</button>
+                <button class="btn" onclick="exportPDF()">📄 Exportar PDF</button>
+                <button class="btn" onclick="resetProgress()">🔄 Resetar</button>
+            </div>
+
+            <div class="theme-buttons">
+                <button class="theme-btn theme-dark" onclick="setTheme('dark')" title="Tema Escuro"></button>
+                <button class="theme-btn theme-light" onclick="setTheme('light')" title="Tema Claro"></button>
+                <button class="theme-btn theme-sepia" onclick="setTheme('sepia')" title="Tema Sépia"></button>
+            </div>
+
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill">0%</div>
+                </div>
+                <div class="stats">
+                    <div class="stat-box">
+                        <div class="stat-number" id="completedDays">0</div>
+                        <div class="stat-label">Concluídos</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number" id="remainingDays">365</div>
+                        <div class="stat-label">Restantes</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number" id="streakDays">0</div>
+                        <div class="stat-label">Sequência</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number" id="currentMonth">0%</div>
+                        <div class="stat-label">Mês Atual</div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main id="mainContent"></main>
+
+        <div class="footer">
+            <p>© 2026 Josias Ramos da Silva | Bíblia em 1 Ano</p>
+        </div>
+    </div>
+
+    <button class="scroll-to-top" id="scrollToTop" onclick="scrollToTop()">↑</button>
+
+    <div class="modal" id="chartsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">📊 Estatísticas e Gráficos</h2>
+                <button class="close-btn" onclick="closeModal('chartsModal')">&times;</button>
+            </div>
+            <div class="chart-container">
+                <canvas id="monthlyChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <canvas id="weeklyChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('✅ Aplicação iniciada');
+
+        // Plano de Leitura Completo - 365 Dias
+        const readingPlan = {
+  "Janeiro": [
+    { day: 1, reading: "Gênesis 1-3", book: "gn", start: 1, end: 3 },
+    { day: 2, reading: "Gênesis 4-6", book: "gn", start: 4, end: 6 },
+    { day: 3, reading: "Gênesis 7-9", book: "gn", start: 7, end: 9 },
+    { day: 4, reading: "Gênesis 10-11", book: "gn", start: 10, end: 11 },
+    { day: 5, reading: "Jó 1-4", book: "jó", start: 1, end: 4 },
+    { day: 6, reading: "Jó 5-7", book: "jó", start: 5, end: 7 },
+    { day: 7, reading: "Jó 8-10", book: "jó", start: 8, end: 10 },
+    { day: 8, reading: "Jó 11-13", book: "jó", start: 11, end: 13 },
+    { day: 9, reading: "Jó 14-17", book: "jó", start: 14, end: 17 },
+    { day: 10, reading: "Jó 18-20", book: "jó", start: 18, end: 20 },
+    { day: 11, reading: "Jó 21-24", book: "jó", start: 21, end: 24 },
+    { day: 12, reading: "Jó 25-27", book: "jó", start: 25, end: 27 },
+    { day: 13, reading: "Jó 28-31", book: "jó", start: 28, end: 31 },
+    { day: 14, reading: "Jó 32-34", book: "jó", start: 32, end: 34 },
+    { day: 15, reading: "Jó 35-38", book: "jó", start: 35, end: 38 },
+    { day: 16, reading: "Jó 39-42", book: "jó", start: 39, end: 42 },
+    { day: 17, reading: "Gênesis 12-15", book: "gn", start: 12, end: 15 },
+    { day: 18, reading: "Gênesis 16-19", book: "gn", start: 16, end: 19 },
+    { day: 19, reading: "Gênesis 20-22", book: "gn", start: 20, end: 22 },
+    { day: 20, reading: "Gênesis 23-26", book: "gn", start: 23, end: 26 },
+    { day: 21, reading: "Gênesis 27-29", book: "gn", start: 27, end: 29 },
+    { day: 22, reading: "Gênesis 30-32", book: "gn", start: 30, end: 32 },
+    { day: 23, reading: "Gênesis 33-36", book: "gn", start: 33, end: 36 },
+    { day: 24, reading: "Gênesis 37-39", book: "gn", start: 37, end: 39 },
+    { day: 25, reading: "Gênesis 40-42", book: "gn", start: 40, end: 42 },
+    { day: 26, reading: "Gênesis 43-46", book: "gn", start: 43, end: 46 },
+    { day: 27, reading: "Gênesis 47-50", book: "gn", start: 47, end: 50 },
+    { day: 28, reading: "Êxodo 1-4", book: "ex", start: 1, end: 4 },
+    { day: 29, reading: "Êxodo 5-7", book: "ex", start: 5, end: 7 },
+    { day: 30, reading: "Êxodo 8-10", book: "ex", start: 8, end: 10 },
+    { day: 31, reading: "Êxodo 11-13", book: "ex", start: 11, end: 13 }
+  ],
+
+  "Fevereiro": [
+    { day: 32, reading: "Êxodo 14-17", book: "ex", start: 14, end: 17 },
+    { day: 33, reading: "Êxodo 18-20", book: "ex", start: 18, end: 20 },
+    { day: 34, reading: "Êxodo 21-24", book: "ex", start: 21, end: 24 },
+    { day: 35, reading: "Êxodo 25-27", book: "ex", start: 25, end: 27 },
+    { day: 36, reading: "Êxodo 28-31", book: "ex", start: 28, end: 31 },
+    { day: 37, reading: "Êxodo 32-34", book: "ex", start: 32, end: 34 },
+    { day: 38, reading: "Êxodo 35-37", book: "ex", start: 35, end: 37 },
+    { day: 39, reading: "Êxodo 38-40", book: "ex", start: 38, end: 40 },
+    { day: 40, reading: "Levítico 1-4", book: "lv", start: 1, end: 4 },
+    { day: 41, reading: "Levítico 5-7", book: "lv", start: 5, end: 7 },
+    { day: 42, reading: "Levítico 8-10", book: "lv", start: 8, end: 10 },
+    { day: 43, reading: "Levítico 11-13", book: "lv", start: 11, end: 13 },
+    { day: 44, reading: "Levítico 14-16", book: "lv", start: 14, end: 16 },
+    { day: 45, reading: "Levítico 17-19", book: "lv", start: 17, end: 19 },
+    { day: 46, reading: "Levítico 20-23", book: "lv", start: 20, end: 23 },
+    { day: 47, reading: "Levítico 24-27", book: "lv", start: 24, end: 27 },
+    { day: 48, reading: "Números 1-3", book: "nm", start: 1, end: 3 },
+    { day: 49, reading: "Números 4-6", book: "nm", start: 4, end: 6 },
+    { day: 50, reading: "Números 7-10", book: "nm", start: 7, end: 10 },
+    { day: 51, reading: "Números 11-14", book: "nm", start: 11, end: 14 },
+    { day: 52, reading: "Números 15-17", book: "nm", start: 15, end: 17 },
+    { day: 53, reading: "Números 18-20", book: "nm", start: 18, end: 20 },
+    { day: 54, reading: "Números 21-24", book: "nm", start: 21, end: 24 },
+    { day: 55, reading: "Números 25-27", book: "nm", start: 25, end: 27 },
+    { day: 56, reading: "Números 28-30", book: "nm", start: 28, end: 30 },
+    { day: 57, reading: "Números 31-33", book: "nm", start: 31, end: 33 },
+    { day: 58, reading: "Números 34-36", book: "nm", start: 34, end: 36 },
+    { day: 59, reading: "Deuteronômio 1-3", book: "dt", start: 1, end: 3 }
+  ],
+
+  "Março": [
+    { day: 60, reading: "Deuteronômio 4-6", book: "dt", start: 4, end: 6 },
+    { day: 61, reading: "Deuteronômio 7-9", book: "dt", start: 7, end: 9 },
+    { day: 62, reading: "Deuteronômio 10-12", book: "dt", start: 10, end: 12 },
+    { day: 63, reading: "Deuteronômio 13-16", book: "dt", start: 13, end: 16 },
+    { day: 64, reading: "Deuteronômio 17-19", book: "dt", start: 17, end: 19 },
+    { day: 65, reading: "Deuteronômio 20-22", book: "dt", start: 20, end: 22 },
+    { day: 66, reading: "Deuteronômio 23-25", book: "dt", start: 23, end: 25 },
+    { day: 67, reading: "Deuteronômio 26-28", book: "dt", start: 26, end: 28 },
+    { day: 68, reading: "Deuteronômio 29-31", book: "dt", start: 29, end: 31 },
+    { day: 69, reading: "Deuteronômio 32-34", book: "dt", start: 32, end: 34 },
+    { day: 70, reading: "Josué 1-4", book: "js", start: 1, end: 4 },
+    { day: 71, reading: "Josué 5-7", book: "js", start: 5, end: 7 },
+    { day: 72, reading: "Josué 8-11", book: "js", start: 8, end: 11 },
+    { day: 73, reading: "Josué 12-15", book: "js", start: 12, end: 15 },
+    { day: 74, reading: "Josué 16-18", book: "js", start: 16, end: 18 },
+    { day: 75, reading: "Josué 19-21", book: "js", start: 19, end: 21 },
+    { day: 76, reading: "Josué 22-24", book: "js", start: 22, end: 24 },
+    { day: 77, reading: "Juízes 1-4", book: "jz", start: 1, end: 4 },
+    { day: 78, reading: "Juízes 5-8", book: "jz", start: 5, end: 8 },
+    { day: 79, reading: "Juízes 9-12", book: "jz", start: 9, end: 12 },
+    { day: 80, reading: "Juízes 13-15", book: "jz", start: 13, end: 15 },
+    { day: 81, reading: "Juízes 16-18", book: "jz", start: 16, end: 18 },
+    { day: 82, reading: "Juízes 19-21", book: "jz", start: 19, end: 21 },
+    { day: 83, reading: "Rute 1-4", book: "rt", start: 1, end: 4 },
+    { day: 84, reading: "1 Samuel 1-3", book: "1sm", start: 1, end: 3 },
+    { day: 85, reading: "1 Samuel 4-7", book: "1sm", start: 4, end: 7 },
+    { day: 86, reading: "1 Samuel 8-10", book: "1sm", start: 8, end: 10 },
+    { day: 87, reading: "1 Samuel 11-13", book: "1sm", start: 11, end: 13 },
+    { day: 88, reading: "1 Samuel 14-16", book: "1sm", start: 14, end: 16 },
+    { day: 89, reading: "1 Samuel 17-20", book: "1sm", start: 17, end: 20 },
+    { day: 90, reading: "1 Samuel 21-24", book: "1sm", start: 21, end: 24 }
+  ],
+
+  "Abril": [
+    { day: 91, reading: "1 Samuel 25-28", book: "1sm", start: 25, end: 28 },
+    { day: 92, reading: "1 Samuel 29-31", book: "1sm", start: 29, end: 31 },
+    { day: 93, reading: "2 Samuel 1-4", book: "2sm", start: 1, end: 4 },
+    { day: 94, reading: "2 Samuel 5-8", book: "2sm", start: 5, end: 8 },
+    { day: 95, reading: "2 Samuel 9-12", book: "2sm", start: 9, end: 12 },
+    { day: 96, reading: "2 Samuel 13-15", book: "2sm", start: 13, end: 15 },
+    { day: 97, reading: "2 Samuel 16-18", book: "2sm", start: 16, end: 18 },
+    { day: 98, reading: "2 Samuel 19-21", book: "2sm", start: 19, end: 21 },
+    { day: 99, reading: "2 Samuel 22-24", book: "2sm", start: 22, end: 24 },
+    { day: 100, reading: "Salmos 1-3", book: "sl", start: 1, end: 3 },
+    { day: 101, reading: "Salmos 4-6", book: "sl", start: 4, end: 6 },
+    { day: 102, reading: "Salmos 7-9", book: "sl", start: 7, end: 9 },
+    { day: 103, reading: "Salmos 10-12", book: "sl", start: 10, end: 12 },
+    { day: 104, reading: "Salmos 13-15", book: "sl", start: 13, end: 15 },
+    { day: 105, reading: "Salmos 16-18", book: "sl", start: 16, end: 18 },
+    { day: 106, reading: "Salmos 19-21", book: "sl", start: 19, end: 21 },
+    { day: 107, reading: "Salmos 22-24", book: "sl", start: 22, end: 24 },
+    { day: 108, reading: "Salmos 25-27", book: "sl", start: 25, end: 27 },
+    { day: 109, reading: "Salmos 28-30", book: "sl", start: 28, end: 30 },
+    { day: 110, reading: "Salmos 31-33", book: "sl", start: 31, end: 33 },
+    { day: 111, reading: "Salmos 34-36", book: "sl", start: 34, end: 36 },
+    { day: 112, reading: "Salmos 37-39", book: "sl", start: 37, end: 39 },
+    { day: 113, reading: "Salmos 40-42", book: "sl", start: 40, end: 42 },
+    { day: 114, reading: "Salmos 43-45", book: "sl", start: 43, end: 45 },
+    { day: 115, reading: "Salmos 46-48", book: "sl", start: 46, end: 48 },
+    { day: 116, reading: "Salmos 49-51", book: "sl", start: 49, end: 51 },
+    { day: 117, reading: "Salmos 52-54", book: "sl", start: 52, end: 54 },
+    { day: 118, reading: "Salmos 55-57", book: "sl", start: 55, end: 57 },
+    { day: 119, reading: "Salmos 58-60", book: "sl", start: 58, end: 60 },
+    { day: 120, reading: "Salmos 61-63", book: "sl", start: 61, end: 63 }
+  ],
+
+  "Maio": [
+    { day: 121, reading: "Salmos 64-66", book: "sl", start: 64, end: 66 },
+    { day: 122, reading: "Salmos 67-69", book: "sl", start: 67, end: 69 },
+    { day: 123, reading: "Salmos 70-72", book: "sl", start: 70, end: 72 },
+    { day: 124, reading: "Salmos 73-75", book: "sl", start: 73, end: 75 },
+    { day: 125, reading: "Salmos 76-78", book: "sl", start: 76, end: 78 },
+    { day: 126, reading: "Salmos 79-81", book: "sl", start: 79, end: 81 },
+    { day: 127, reading: "Salmos 82-84", book: "sl", start: 82, end: 84 },
+    { day: 128, reading: "Salmos 85-87", book: "sl", start: 85, end: 87 },
+    { day: 129, reading: "Salmos 88-90", book: "sl", start: 88, end: 90 },
+    { day: 130, reading: "Salmos 91-93", book: "sl", start: 91, end: 93 },
+    { day: 131, reading: "Salmos 94-96", book: "sl", start: 94, end: 96 },
+    { day: 132, reading: "Salmos 97-99", book: "sl", start: 97, end: 99 },
+    { day: 133, reading: "Salmos 100-102", book: "sl", start: 100, end: 102 },
+    { day: 134, reading: "Salmos 103-105", book: "sl", start: 103, end: 105 },
+    { day: 135, reading: "Salmos 106-108", book: "sl", start: 106, end: 108 },
+    { day: 136, reading: "Salmos 109-111", book: "sl", start: 109, end: 111 },
+    { day: 137, reading: "Salmos 112-114", book: "sl", start: 112, end: 114 },
+    { day: 138, reading: "Salmos 115-118", book: "sl", start: 115, end: 118 },
+    { day: 139, reading: "Salmos 119", book: "sl", start: 119, end: 119 },
+    { day: 140, reading: "Salmos 120-123", book: "sl", start: 120, end: 123 },
+    { day: 141, reading: "Salmos 124-126", book: "sl", start: 124, end: 126 },
+    { day: 142, reading: "Salmos 127-129", book: "sl", start: 127, end: 129 },
+    { day: 143, reading: "Salmos 130-132", book: "sl", start: 130, end: 132 },
+    { day: 144, reading: "Salmos 133-135", book: "sl", start: 133, end: 135 },
+    { day: 145, reading: "Salmos 136-138", book: "sl", start: 136, end: 138 },
+    { day: 146, reading: "Salmos 139-141", book: "sl", start: 139, end: 141 },
+    { day: 147, reading: "Salmos 142-144", book: "sl", start: 142, end: 144 },
+    { day: 148, reading: "Salmos 145-147", book: "sl", start: 145, end: 147 },
+    { day: 149, reading: "Salmos 148-150", book: "sl", start: 148, end: 150 },
+    { day: 150, reading: "1 Reis 1-4", book: "1rs", start: 1, end: 4 },
+    { day: 151, reading: "Provérbios 1-3", book: "pv", start: 1, end: 3 }
+  ],
+
+  "Junho": [
+    { day: 152, reading: "Provérbios 4-7", book: "pv", start: 4, end: 7 },
+    { day: 153, reading: "Provérbios 8-11", book: "pv", start: 8, end: 11 },
+    { day: 154, reading: "Provérbios 12-14", book: "pv", start: 12, end: 14 },
+    { day: 155, reading: "Provérbios 15-18", book: "pv", start: 15, end: 18 },
+    { day: 156, reading: "Provérbios 19-21", book: "pv", start: 19, end: 21 },
+    { day: 157, reading: "Provérbios 22-24", book: "pv", start: 22, end: 24 },
+    { day: 158, reading: "Provérbios 25-28", book: "pv", start: 25, end: 28 },
+    { day: 159, reading: "Provérbios 29-31", book: "pv", start: 29, end: 31 },
+    { day: 160, reading: "Eclesiastes 1-3", book: "ec", start: 1, end: 3 },
+    { day: 161, reading: "Eclesiastes 4-6", book: "ec", start: 4, end: 6 },
+    { day: 162, reading: "Eclesiastes 7-9", book: "ec", start: 7, end: 9 },
+    { day: 163, reading: "Eclesiastes 10-12", book: "ec", start: 10, end: 12 },
+    { day: 164, reading: "Cânticos 1-4", book: "ct", start: 1, end: 4 },
+    { day: 165, reading: "Cânticos 5-8", book: "ct", start: 5, end: 8 },
+    { day: 166, reading: "1 Reis 5-7", book: "1rs", start: 5, end: 7 },
+    { day: 167, reading: "1 Reis 8-10", book: "1rs", start: 8, end: 10 },
+    { day: 168, reading: "1 Reis 11-13", book: "1rs", start: 11, end: 13 },
+    { day: 169, reading: "1 Reis 14-16", book: "1rs", start: 14, end: 16 },
+    { day: 170, reading: "1 Reis 17-19", book: "1rs", start: 17, end: 19 },
+    { day: 171, reading: "1 Reis 20-22", book: "1rs", start: 20, end: 22 },
+    { day: 172, reading: "2 Reis 1-3", book: "2rs", start: 1, end: 3 },
+    { day: 173, reading: "2 Reis 4-6", book: "2rs", start: 4, end: 6 },
+    { day: 174, reading: "2 Reis 7-10", book: "2rs", start: 7, end: 10 },
+    { day: 175, reading: "2 Reis 11-13", book: "2rs", start: 11, end: 13 },
+    { day: 176, reading: "Joel 1-3", book: "jl", start: 1, end: 3 },
+    { day: 177, reading: "2 Reis 14; Jonas 1-4", book: "2rs", start: 14, end: 14 },
+    { day: 178, reading: "Amós 1-3", book: "am", start: 1, end: 3 },
+    { day: 179, reading: "Amós 4-6", book: "am", start: 4, end: 6 },
+    { day: 180, reading: "Amós 7-9", book: "am", start: 7, end: 9 },
+    { day: 181, reading: "2 Reis 15-17", book: "2rs", start: 15, end: 17 }
+  ],
+
+  "Julho": [
+    { day: 182, reading: "Oséias 1-4", book: "os", start: 1, end: 4 },
+    { day: 183, reading: "Oséias 5-7", book: "os", start: 5, end: 7 },
+    { day: 184, reading: "Oséias 8-10", book: "os", start: 8, end: 10 },
+    { day: 185, reading: "Oséias 11-14", book: "os", start: 11, end: 14 },
+    { day: 186, reading: "2 Reis 18-19", book: "2rs", start: 18, end: 19 },
+    { day: 187, reading: "Isaías 1-3", book: "is", start: 1, end: 3 },
+    { day: 188, reading: "Isaías 4-6", book: "is", start: 4, end: 6 },
+    { day: 189, reading: "Isaías 7-9", book: "is", start: 7, end: 9 },
+    { day: 190, reading: "Isaías 10-12", book: "is", start: 10, end: 12 },
+    { day: 191, reading: "Isaías 13-15", book: "is", start: 13, end: 15 },
+    { day: 192, reading: "Isaías 16-18", book: "is", start: 16, end: 18 },
+    { day: 193, reading: "Isaías 19-21", book: "is", start: 19, end: 21 },
+    { day: 194, reading: "Isaías 22-24", book: "is", start: 22, end: 24 },
+    { day: 195, reading: "Isaías 25-27", book: "is", start: 25, end: 27 },
+    { day: 196, reading: "Isaías 28-30", book: "is", start: 28, end: 30 },
+    { day: 197, reading: "Isaías 31-33", book: "is", start: 31, end: 33 },
+    { day: 198, reading: "Isaías 34-36", book: "is", start: 34, end: 36 },
+    { day: 199, reading: "Isaías 37-39; 2 Reis 20", book: "is", start: 37, end: 39 },
+    { day: 200, reading: "Isaías 40-42", book: "is", start: 40, end: 42 },
+    { day: 201, reading: "Isaías 43-45", book: "is", start: 43, end: 45 },
+    { day: 202, reading: "Isaías 46-48", book: "is", start: 46, end: 48 },
+    { day: 203, reading: "Isaías 49-51", book: "is", start: 49, end: 51 },
+    { day: 204, reading: "Isaías 52-54", book: "is", start: 52, end: 54 },
+    { day: 205, reading: "Isaías 55-57", book: "is", start: 55, end: 57 },
+    { day: 206, reading: "Isaías 58-60", book: "is", start: 58, end: 60 },
+    { day: 207, reading: "Isaías 61-63", book: "is", start: 61, end: 63 },
+    { day: 208, reading: "Isaías 64-66", book: "is", start: 64, end: 66 },
+    { day: 209, reading: "Miquéias 1-4", book: "mq", start: 1, end: 4 },
+    { day: 210, reading: "Miquéias 5-7", book: "mq", start: 5, end: 7 },
+    { day: 211, reading: "Naum 1-3", book: "na", start: 1, end: 3 },
+    { day: 212, reading: "Sofonias 1-3", book: "sf", start: 1, end: 3 }
+  ],
+
+  "Agosto": [
+    { day: 213, reading: "Habacuque 1-3", book: "hc", start: 1, end: 3 },
+    { day: 214, reading: "Obadias 1; Jeremias 1", book: "ob", start: 1, end: 1 },
+    { day: 215, reading: "Jeremias 2-5", book: "jr", start: 2, end: 5 },
+    { day: 216, reading: "Jeremias 6-8", book: "jr", start: 6, end: 8 },
+    { day: 217, reading: "Jeremias 9-12", book: "jr", start: 9, end: 12 },
+    { day: 218, reading: "Jeremias 13-16", book: "jr", start: 13, end: 16 },
+    { day: 219, reading: "Jeremias 17-20", book: "jr", start: 17, end: 20 },
+    { day: 220, reading: "Jeremias 21-23", book: "jr", start: 21, end: 23 },
+    { day: 221, reading: "Jeremias 24-26", book: "jr", start: 24, end: 26 },
+    { day: 222, reading: "Jeremias 27-29", book: "jr", start: 27, end: 29 },
+    { day: 223, reading: "Jeremias 30-32", book: "jr", start: 30, end: 32 },
+    { day: 224, reading: "Jeremias 33-37", book: "jr", start: 33, end: 37 },
+    { day: 225, reading: "2 Reis 25", book: "2rs", start: 25, end: 25 },
+    { day: 226, reading: "Jeremias 38-42", book: "jr", start: 38, end: 42 },
+    { day: 227, reading: "Jeremias 43-46", book: "jr", start: 43, end: 46 },
+    { day: 228, reading: "Jeremias 47-49", book: "jr", start: 47, end: 49 },
+    { day: 229, reading: "Jeremias 50-52", book: "jr", start: 50, end: 52 },
+    { day: 230, reading: "Lamentações 1-5", book: "lm", start: 1, end: 5 },
+    { day: 231, reading: "1 Crônicas 1-3", book: "1cr", start: 1, end: 3 },
+    { day: 232, reading: "1 Crônicas 4-6", book: "1cr", start: 4, end: 6 },
+    { day: 233, reading: "1 Crônicas 7-9", book: "1cr", start: 7, end: 9 },
+    { day: 234, reading: "1 Crônicas 10-13", book: "1cr", start: 10, end: 13 },
+    { day: 235, reading: "1 Crônicas 14-16", book: "1cr", start: 14, end: 16 },
+    { day: 236, reading: "1 Crônicas 17-19", book: "1cr", start: 17, end: 19 },
+    { day: 237, reading: "1 Crônicas 20-23", book: "1cr", start: 20, end: 23 },
+    { day: 238, reading: "1 Crônicas 24-26", book: "1cr", start: 24, end: 26 },
+    { day: 239, reading: "1 Crônicas 27-29", book: "1cr", start: 27, end: 29 },
+    { day: 240, reading: "2 Crônicas 1-3", book: "2cr", start: 1, end: 3 },
+    { day: 241, reading: "2 Crônicas 4-6", book: "2cr", start: 4, end: 6 },
+    { day: 242, reading: "2 Crônicas 7-9", book: "2cr", start: 7, end: 9 },
+    { day: 243, reading: "2 Crônicas 10-13", book: "2cr", start: 10, end: 13 }
+  ],
+
+  "Setembro": [
+    { day: 244, reading: "2 Crônicas 14-16", book: "2cr", start: 14, end: 16 },
+    { day: 245, reading: "2 Crônicas 17-19", book: "2cr", start: 17, end: 19 },
+    { day: 246, reading: "2 Crônicas 20-22", book: "2cr", start: 20, end: 22 },
+    { day: 247, reading: "2 Crônicas 23-25", book: "2cr", start: 23, end: 25 },
+    { day: 248, reading: "2 Crônicas 26-29", book: "2cr", start: 26, end: 29 },
+    { day: 249, reading: "2 Crônicas 30-33", book: "2cr", start: 30, end: 33 },
+    { day: 250, reading: "2 Crônicas 34-36", book: "2cr", start: 34, end: 36 },
+    { day: 251, reading: "2 Reis 20-24", book: "2rs", start: 20, end: 24 },
+    { day: 252, reading: "Ezequiel 1-4", book: "ez", start: 1, end: 4 },
+    { day: 253, reading: "Ezequiel 5-8", book: "ez", start: 5, end: 8 },
+    { day: 254, reading: "Ezequiel 9-12", book: "ez", start: 9, end: 12 },
+    { day: 255, reading: "Ezequiel 13-16", book: "ez", start: 13, end: 16 },
+    { day: 256, reading: "Ezequiel 17-20", book: "ez", start: 17, end: 20 },
+    { day: 257, reading: "Ezequiel 21-24", book: "ez", start: 21, end: 24 },
+    { day: 258, reading: "Ezequiel 25-27", book: "ez", start: 25, end: 27 },
+    { day: 259, reading: "Ezequiel 28-30", book: "ez", start: 28, end: 30 },
+    { day: 260, reading: "Ezequiel 31-33", book: "ez", start: 31, end: 33 },
+    { day: 261, reading: "Ezequiel 34-36", book: "ez", start: 34, end: 36 },
+    { day: 262, reading: "Ezequiel 37-39", book: "ez", start: 37, end: 39 },
+    { day: 263, reading: "Ezequiel 40-42", book: "ez", start: 40, end: 42 },
+    { day: 264, reading: "Ezequiel 43-45", book: "ez", start: 43, end: 45 },
+    { day: 265, reading: "Ezequiel 46-48", book: "ez", start: 46, end: 48 },
+    { day: 266, reading: "Daniel 1-3", book: "dn", start: 1, end: 3 },
+    { day: 267, reading: "Daniel 4-6", book: "dn", start: 4, end: 6 },
+    { day: 268, reading: "Daniel 7-9", book: "dn", start: 7, end: 9 },
+    { day: 269, reading: "Daniel 10-12", book: "dn", start: 10, end: 12 },
+    { day: 270, reading: "Ester 1-3", book: "et", start: 1, end: 3 },
+    { day: 271, reading: "Ester 4-7", book: "et", start: 4, end: 7 },
+    { day: 272, reading: "Ester 8-10", book: "et", start: 8, end: 10 },
+    { day: 273, reading: "Esdras 1-4", book: "ed", start: 1, end: 4 }
+  ],
+
+  "Outubro": [
+    { day: 274, reading: "Ageu 1-2; Zacarias 1", book: "ag", start: 1, end: 2 },
+    { day: 275, reading: "Zacarias 2-5", book: "zc", start: 2, end: 5 },
+    { day: 276, reading: "Zacarias 6-10", book: "zc", start: 6, end: 10 },
+    { day: 277, reading: "Zacarias 11-14", book: "zc", start: 11, end: 14 },
+    { day: 278, reading: "Esdras 5-7", book: "ed", start: 5, end: 7 },
+    { day: 279, reading: "Esdras 8-10", book: "ed", start: 8, end: 10 },
+    { day: 280, reading: "Neemias 1-3", book: "ne", start: 1, end: 3 },
+    { day: 281, reading: "Neemias 4-6", book: "ne", start: 4, end: 6 },
+    { day: 282, reading: "Neemias 7-9", book: "ne", start: 7, end: 9 },
+    { day: 283, reading: "Neemias 10-13", book: "ne", start: 10, end: 13 },
+    { day: 284, reading: "Malaquias 1-4", book: "ml", start: 1, end: 4 },
+    { day: 285, reading: "Mateus 1-4", book: "mt", start: 1, end: 4 },
+    { day: 286, reading: "Mateus 5-7", book: "mt", start: 5, end: 7 },
+    { day: 287, reading: "Mateus 8-11", book: "mt", start: 8, end: 11 },
+    { day: 288, reading: "Mateus 12-15", book: "mt", start: 12, end: 15 },
+    { day: 289, reading: "Mateus 16-19", book: "mt", start: 16, end: 19 },
+    { day: 290, reading: "Mateus 20-22", book: "mt", start: 20, end: 22 },
+    { day: 291, reading: "Mateus 23-25", book: "mt", start: 23, end: 25 },
+    { day: 292, reading: "Mateus 26-28", book: "mt", start: 26, end: 28 },
+    { day: 293, reading: "Marcos 1-3", book: "mc", start: 1, end: 3 },
+    { day: 294, reading: "Marcos 4-6", book: "mc", start: 4, end: 6 },
+    { day: 295, reading: "Marcos 7-10", book: "mc", start: 7, end: 10 },
+    { day: 296, reading: "Marcos 11-13", book: "mc", start: 11, end: 13 },
+    { day: 297, reading: "Marcos 14-16", book: "mc", start: 14, end: 16 },
+    { day: 298, reading: "Lucas 1-3", book: "lc", start: 1, end: 3 },
+    { day: 299, reading: "Lucas 4-6", book: "lc", start: 4, end: 6 },
+    { day: 300, reading: "Lucas 7-9", book: "lc", start: 7, end: 9 },
+    { day: 301, reading: "Lucas 10-13", book: "lc", start: 10, end: 13 },
+    { day: 302, reading: "Lucas 14-17", book: "lc", start: 14, end: 17 },
+    { day: 303, reading: "Lucas 18-21", book: "lc", start: 18, end: 21 },
+    { day: 304, reading: "Lucas 22-24", book: "lc", start: 22, end: 24 }
+  ],
+
+  "Novembro": [
+    { day: 305, reading: "João 1-3", book: "jo", start: 1, end: 3 },
+    { day: 306, reading: "João 4-6", book: "jo", start: 4, end: 6 },
+    { day: 307, reading: "João 7-10", book: "jo", start: 7, end: 10 },
+    { day: 308, reading: "João 11-13", book: "jo", start: 11, end: 13 },
+    { day: 309, reading: "João 14-17", book: "jo", start: 14, end: 17 },
+    { day: 310, reading: "João 18-21", book: "jo", start: 18, end: 21 },
+    { day: 311, reading: "Atos 1-3", book: "at", start: 1, end: 3 },
+    { day: 312, reading: "Atos 4-6", book: "at", start: 4, end: 6 },
+    { day: 313, reading: "Atos 7-9", book: "at", start: 7, end: 9 },
+    { day: 314, reading: "Atos 10-13", book: "at", start: 10, end: 13 },
+    { day: 315, reading: "Tiago 1-2", book: "tg", start: 1, end: 2 },
+    { day: 316, reading: "Tiago 3-5", book: "tg", start: 3, end: 5 },
+    { day: 317, reading: "Atos 14; Gálatas 1-3", book: "at", start: 14, end: 14 },
+    { day: 318, reading: "Gálatas 4-6", book: "gl", start: 4, end: 6 },
+    { day: 319, reading: "Atos 15-19", book: "at", start: 15, end: 19 },
+    { day: 320, reading: "1 Tessalonicenses 1-5", book: "1ts", start: 1, end: 5 },
+    { day: 321, reading: "2 Tessalonicenses 1-3", book: "2ts", start: 1, end: 3 },
+    { day: 322, reading: "1 Coríntios 1-4", book: "1co", start: 1, end: 4 },
+    { day: 323, reading: "1 Coríntios 5-8", book: "1co", start: 5, end: 8 },
+    { day: 324, reading: "1 Coríntios 9-12", book: "1co", start: 9, end: 12 },
+    { day: 325, reading: "1 Coríntios 13-16", book: "1co", start: 13, end: 16 },
+    { day: 326, reading: "2 Coríntios 1-3", book: "2co", start: 1, end: 3 },
+    { day: 327, reading: "2 Coríntios 4-6", book: "2co", start: 4, end: 6 },
+    { day: 328, reading: "2 Coríntios 7-9", book: "2co", start: 7, end: 9 },
+    { day: 329, reading: "2 Coríntios 10-13", book: "2co", start: 10, end: 13 },
+    { day: 330, reading: "Romanos 1-4", book: "rm", start: 1, end: 4 },
+    { day: 331, reading: "Romanos 5-8", book: "rm", start: 5, end: 8 },
+    { day: 332, reading: "Romanos 9-11", book: "rm", start: 9, end: 11 },
+    { day: 333, reading: "Romanos 12-16", book: "rm", start: 12, end: 16 },
+    { day: 334, reading: "Atos 20-22", book: "at", start: 20, end: 22 }
+  ],
+
+  "Dezembro": [
+    { day: 335, reading: "Atos 23-25", book: "at", start: 23, end: 25 },
+    { day: 336, reading: "Atos 26-28", book: "at", start: 26, end: 28 },
+    { day: 337, reading: "Efésios 1-3", book: "ef", start: 1, end: 3 },
+    { day: 338, reading: "Efésios 4-6", book: "ef", start: 4, end: 6 },
+    { day: 339, reading: "Filipenses 1-4", book: "fp", start: 1, end: 4 },
+    { day: 340, reading: "Colossenses 1-4", book: "cl", start: 1, end: 4 },
+    { day: 341, reading: "Hebreus 1-4", book: "hb", start: 1, end: 4 },
+    { day: 342, reading: "Hebreus 5-7", book: "hb", start: 5, end: 7 },
+    { day: 343, reading: "Hebreus 8-10", book: "hb", start: 8, end: 10 },
+    { day: 344, reading: "Hebreus 11-13", book: "hb", start: 11, end: 13 },
+    { day: 345, reading: "Filemom 1", book: "fm", start: 1, end: 1 },
+    { day: 346, reading: "1 Pedro 1-2", book: "1pe", start: 1, end: 2 },
+    { day: 347, reading: "1 Pedro 3-5", book: "1pe", start: 3, end: 5 },
+    { day: 348, reading: "2 Pedro 1-3", book: "2pe", start: 1, end: 3 },
+    { day: 349, reading: "1 Timóteo 1-3", book: "1tm", start: 1, end: 3 },
+    { day: 350, reading: "1 Timóteo 4-6", book: "1tm", start: 4, end: 6 },
+    { day: 351, reading: "Tito 1-3", book: "tt", start: 1, end: 3 },
+    { day: 352, reading: "2 Timóteo 1-4", book: "2tm", start: 1, end: 4 },
+    { day: 353, reading: "1 João 1-2", book: "1jo", start: 1, end: 2 },
+    { day: 354, reading: "1 João 3-5", book: "1jo", start: 3, end: 5 },
+    { day: 355, reading: "2 João 1", book: "2jo", start: 1, end: 1 },
+    { day: 356, reading: "3 João 1", book: "3jo", start: 1, end: 1 },
+    { day: 357, reading: "Judas 1", book: "jd", start: 1, end: 1 },
+    { day: 358, reading: "Apocalipse 1-3", book: "ap", start: 1, end: 3 },
+    { day: 359, reading: "Apocalipse 4-6", book: "ap", start: 4, end: 6 },
+    { day: 360, reading: "Apocalipse 7-9", book: "ap", start: 7, end: 9 },
+    { day: 361, reading: "Apocalipse 10-12", book: "ap", start: 10, end: 12 },
+    { day: 362, reading: "Apocalipse 13-15", book: "ap", start: 13, end: 15 },
+    { day: 363, reading: "Apocalipse 16-18", book: "ap", start: 16, end: 18 },
+    { day: 364, reading: "Apocalipse 19-21", book: "ap", start: 19, end: 21 },
+    { day: 365, reading: "Apocalipse 22", book: "ap", start: 22, end: 22 }
+  ]
+};
+
+        // Funções de Tema
+        function setTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+        }
+
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            setTheme(savedTheme);
+        }
+
+        // Função para obter mês atual
+        function getCurrentMonth() {
+            const months = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho',
+                          'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+            return months[new Date().getMonth()];
+        }
+
+        // Accordion - Meses Retráteis
+        function toggleMonth(monthName) {
+            const section = document.getElementById(`month-${monthName}`);
+            if (!section) return;
+
+            const isCollapsed = section.classList.contains('collapsed');
+            if (isCollapsed) {
+                section.classList.remove('collapsed');
+                localStorage.setItem(`month-${monthName}`, 'open');
+            } else {
+                section.classList.add('collapsed');
+                localStorage.setItem(`month-${monthName}`, 'closed');
+            }
+        }
+
+        // Botão Voltar ao Topo
+        function handleScroll() {
+            const btn = document.getElementById('scrollToTop');
+            if (window.pageYOffset > 300) {
+                btn.classList.add('visible');
+            } else {
+                btn.classList.remove('visible');
+            }
+        }
+
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        window.addEventListener('scroll', handleScroll);
+
+        // Marcar/Desmarcar Dia
+        function toggleDay(day) {
+            const isChecked = localStorage.getItem(`day-${day}`) === 'true';
+            localStorage.setItem(`day-${day}`, (!isChecked).toString());
+
+            const card = document.getElementById(`day-${day}`);
+            if (card) {
+                if (!isChecked) {
+                    card.classList.add('completed');
+                } else {
+                    card.classList.remove('completed');
+                }
+            }
+
+            updateProgress();
+        }
+
+        // Sistema de Anotações
+        function toggleNote(day) {
+            const noteArea = document.getElementById(`note-${day}`);
+            if (noteArea) {
+                noteArea.classList.toggle('active');
+            }
+        }
+
+        function saveNote(day) {
+            const textarea = document.getElementById(`note-text-${day}`);
+            const note = textarea.value.trim();
+
+            if (note) {
+                localStorage.setItem(`note-${day}`, note);
+                showNoteDisplay(day, note);
+                alert('✅ Anotação salva!');
+            } else {
+                localStorage.removeItem(`note-${day}`);
+                alert('Anotação removida');
+            }
+        }
+
+        function showNoteDisplay(day, note) {
+            const noteArea = document.getElementById(`note-${day}`);
+            if (!note) {
+                const savedNote = localStorage.getItem(`note-${day}`);
+                if (savedNote) note = savedNote;
+            }
+
+            if (note && noteArea) {
+                const display = noteArea.querySelector('.note-display');
+                if (display) {
+                    display.textContent = note;
+                    display.style.display = 'block';
+                }
+            }
+        }
+
+        // Atualizar Progresso
+        function updateProgress() {
+            let completed = 0;
+            for (let i = 1; i <= 365; i++) {
+                if (localStorage.getItem(`day-${i}`) === 'true') {
+                    completed++;
+                }
+            }
+
+            const percentage = Math.round((completed / 365) * 100);
+            const remaining = 365 - completed;
+
+            let streak = 0;
+            for (let i = 1; i <= 365; i++) {
+                if (localStorage.getItem(`day-${i}`) === 'true') {
+                    streak++;
+                } else {
+                    break;
+                }
+            }
+
+            document.getElementById('progressFill').style.width = percentage + '%';
+            document.getElementById('progressFill').textContent = percentage + '%';
+            document.getElementById('completedDays').textContent = completed;
+            document.getElementById('remainingDays').textContent = remaining;
+            document.getElementById('streakDays').textContent = streak;
+
+            const currentMonth = getCurrentMonth();
+            const monthDays = readingPlan[currentMonth] || [];
+            let monthCompleted = 0;
+            for (let i = 0; i < monthDays.length; i++) {
+                if (localStorage.getItem(`day-${monthDays[i].day}`) === 'true') {
+                    monthCompleted++;
+                }
+            }
+            const monthPercentage = monthDays.length > 0 ? Math.round((monthCompleted / monthDays.length) * 100) : 0;
+            document.getElementById('currentMonth').textContent = monthPercentage + '%';
+
+            updateMonthProgress();
+        }
+
+        function updateMonthProgress() {
+            const months = Object.keys(readingPlan);
+            for (const month of months) {
+                const progressEl = document.getElementById(`progress-${month}`);
+                if (progressEl) {
+                    const days = readingPlan[month];
+                    let completed = 0;
+                    for (const day of days) {
+                        if (localStorage.getItem(`day-${day.day}`) === 'true') {
+                            completed++;
+                        }
+                    }
+                    const pct = Math.round((completed / days.length) * 100);
+                    progressEl.textContent = `${completed}/${days.length} (${pct}%)`;
+                }
+            }
+        }
+
+        // Notificações
+        function openNotifications() {
+            if (!('Notification' in window)) {
+                alert('❌ Seu navegador não suporta notificações');
+                return;
+            }
+
+            let msg = `Status: ${Notification.permission}\n\n`;
+
+            if (Notification.permission === 'granted') {
+                msg += '✅ Notificações permitidas!\n\nDeseja testar uma notificação agora?';
+
+                if (confirm(msg)) {
+                    new Notification('📖 Bíblia em 1 Ano', {
+                        body: 'Lembre-se de ler a Bíblia hoje!',
+                        icon: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Ctext y="75" font-size="75"%3E📖%3C/text%3E%3C/svg%3E'
+                    });
+                }
+            } else if (Notification.permission === 'denied') {
+                alert('❌ Notificações bloqueadas.\n\nPara ativar:\n1. Configurações do navegador\n2. Permissões do site\n3. Permitir notificações');
+            } else {
+                msg += 'Quer ativar notificações de lembrete?';
+
+                if (confirm(msg)) {
+                    Notification.requestPermission().then(permission => {
+                        if (permission === 'granted') {
+                            alert('✅ Notificações ativadas!');
+                            new Notification('📖 Bíblia em 1 Ano', {
+                                body: 'Notificações configuradas com sucesso!',
+                                icon: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Ctext y="75" font-size="75"%3E📖%3C/text%3E%3C/svg%3E'
+                            });
+                        } else {
+                            alert('❌ Permissão negada');
+                        }
+                    });
+                }
+            }
+        }
+
+        // Gráficos
+        let monthlyChart = null;
+        let weeklyChart = null;
+
+        function openCharts() {
+            const modal = document.getElementById('chartsModal');
+            modal.classList.add('active');
+
+            setTimeout(() => {
+                createMonthlyChart();
+                createWeeklyChart();
+            }, 100);
+        }
+
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.classList.remove('active');
+
+            if (monthlyChart) monthlyChart.destroy();
+            if (weeklyChart) weeklyChart.destroy();
+        }
+
+        function createMonthlyChart() {
+            const ctx = document.getElementById('monthlyChart').getContext('2d');
+
+            const months = Object.keys(readingPlan);
+            const data = months.map(month => {
+                const days = readingPlan[month];
+                let completed = 0;
+                for (const day of days) {
+                    if (localStorage.getItem(`day-${day.day}`) === 'true') {
+                        completed++;
+                    }
+                }
+                return Math.round((completed / days.length) * 100);
+            });
+
+            if (monthlyChart) monthlyChart.destroy();
+
+            monthlyChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: months,
+                    datasets: [{
+                        label: 'Progresso Mensal (%)',
+                        data: data,
+                        backgroundColor: 'rgba(255, 215, 0, 0.7)',
+                        borderColor: 'rgba(255, 215, 0, 1)',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+        }
+
+        function createWeeklyChart() {
+            const ctx = document.getElementById('weeklyChart').getContext('2d');
+
+            const labels = [];
+            const data = [];
+            const today = new Date().getDate();
+
+            for (let i = 6; i >= 0; i--) {
+                const date = new Date();
+                date.setDate(today - i);
+                labels.push(date.toLocaleDateString('pt-BR', { weekday: 'short' }));
+
+                const dayNum = Math.max(1, Math.min(365, today - i));
+                data.push(localStorage.getItem(`day-${dayNum}`) === 'true' ? 1 : 0);
+            }
+
+            if (weeklyChart) weeklyChart.destroy();
+
+            weeklyChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Últimos 7 Dias',
+                        data: data,
+                        backgroundColor: 'rgba(255, 215, 0, 0.2)',
+                        borderColor: 'rgba(255, 215, 0, 1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 1,
+                            ticks: {
+                                stepSize: 1,
+                                callback: value => value === 1 ? 'Lido' : 'Não lido'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Exportar PDF
+        function exportPDF() {
+            if (typeof jspdf === 'undefined' || !jspdf.jsPDF) {
+                alert('❌ Biblioteca PDF não carregada. Tente recarregar a página.');
+                return;
+            }
+
+            const { jsPDF } = jspdf;
+            const doc = new jsPDF();
+
+            doc.setFontSize(20);
+            doc.text('Bíblia em 1 Ano - 2026', 20, 20);
+            doc.setFontSize(12);
+            doc.text('Por Josias Ramos da Silva', 20, 30);
+
+            let completed = 0;
+            for (let i = 1; i <= 365; i++) {
+                if (localStorage.getItem(`day-${i}`) === 'true') {
+                    completed++;
+                }
+            }
+
+            const percentage = Math.round((completed / 365) * 100);
+
+            doc.setFontSize(14);
+            doc.text(`Progresso Geral: ${completed}/365 dias (${percentage}%)`, 20, 45);
+
+            let y = 60;
+            doc.setFontSize(10);
+
+            for (const month of Object.keys(readingPlan)) {
+                if (y > 270) {
+                    doc.addPage();
+                    y = 20;
+                }
+
+                doc.setFontSize(12);
+                doc.setFont(undefined, 'bold');
+                doc.text(month, 20, y);
+                y += 7;
+
+                doc.setFontSize(9);
+                doc.setFont(undefined, 'normal');
+
+                const days = readingPlan[month];
+                for (const day of days) {
+                    const isCompleted = localStorage.getItem(`day-${day.day}`) === 'true';
+                    const status = isCompleted ? '[X]' : '[ ]';
+                    doc.text(`${status} Dia ${day.day}: ${day.reading}`, 25, y);
+                    y += 5;
+
+                    if (y > 280) {
+                        doc.addPage();
+                        y = 20;
+                    }
+                }
+
+                y += 5;
+            }
+
+            doc.save('biblia-1-ano-2026-progresso.pdf');
+            alert('✅ PDF exportado com sucesso!');
+        }
+
+        // Reset
+        function resetProgress() {
+            if (confirm('⚠️ ATENÇÃO! Isso vai apagar TODO o seu progresso e anotações.\n\nTem certeza?')) {
+                if (confirm('Tem CERTEZA ABSOLUTA? Esta ação não pode ser desfeita!')) {
+                    for (let i = 1; i <= 365; i++) {
+                        localStorage.removeItem(`day-${i}`);
+                        localStorage.removeItem(`note-${i}`);
+                    }
+                    Object.keys(readingPlan).forEach(month => {
+                        localStorage.removeItem(`month-${month}`);
+                    });
+                    alert('✅ Progresso resetado!');
+                    location.reload();
+                }
+            }
+        }
+
+        // Criar Card de Dia
+        function createCard(item) {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.id = `day-${item.day}`;
+
+            const isCompleted = localStorage.getItem(`day-${item.day}`) === 'true';
+            if (isCompleted) {
+                card.classList.add('completed');
+            }
+
+            // Header
+            const header = document.createElement('div');
+            header.className = 'card-header';
+
+            const dayLabel = document.createElement('div');
+            dayLabel.className = 'day-label';
+            dayLabel.textContent = `Dia ${item.day}`;
+
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.checked = isCompleted;
+            checkbox.onchange = () => toggleDay(item.day);
+
+            const checkboxDiv = document.createElement('div');
+            checkboxDiv.className = 'checkbox-container';
+            checkboxDiv.appendChild(checkbox);
+
+            header.appendChild(dayLabel);
+            header.appendChild(checkboxDiv);
+
+            // Reading text
+            const reading = document.createElement('div');
+            reading.className = 'reading-text';
+            reading.textContent = item.reading;
+
+            // Actions
+            const actions = document.createElement('div');
+            actions.className = 'card-actions';
+
+            const readLink = document.createElement('a');
+            readLink.className = 'read-button';
+            readLink.href = `https://www.bibliaonline.com.br/nvi/${item.book}/${item.start}`;
+            readLink.target = '_blank';
+            readLink.textContent = '📖 Ler Online';
+
+            const noteBtn = document.createElement('button');
+            noteBtn.className = 'note-button';
+            noteBtn.textContent = '📝 Anotação';
+            noteBtn.onclick = () => toggleNote(item.day);
+
+            actions.appendChild(readLink);
+            actions.appendChild(noteBtn);
+
+            // Note Area
+            const noteArea = document.createElement('div');
+            noteArea.className = 'note-area';
+            noteArea.id = `note-${item.day}`;
+
+            const textarea = document.createElement('textarea');
+            textarea.className = 'note-textarea';
+            textarea.id = `note-text-${item.day}`;
+            textarea.placeholder = 'Escreva suas anotações aqui...';
+            textarea.value = localStorage.getItem(`note-${item.day}`) || '';
+
+            const saveBtn = document.createElement('button');
+            saveBtn.className = 'btn';
+            saveBtn.textContent = '💾 Salvar Anotação';
+            saveBtn.style.marginTop = '10px';
+            saveBtn.onclick = () => saveNote(item.day);
+
+            const noteDisplay = document.createElement('div');
+            noteDisplay.className = 'note-display';
+            noteDisplay.style.display = 'none';
+
+            const savedNote = localStorage.getItem(`note-${item.day}`);
+            if (savedNote) {
+                noteDisplay.textContent = savedNote;
+                noteDisplay.style.display = 'block';
+            }
+
+            noteArea.appendChild(textarea);
+            noteArea.appendChild(saveBtn);
+            noteArea.appendChild(noteDisplay);
+
+            card.appendChild(header);
+            card.appendChild(reading);
+            card.appendChild(actions);
+            card.appendChild(noteArea);
+
+            return card;
+        }
+
+        // Gerar Conteúdo
+        function generateContent() {
+            console.log('✅ Gerando conteúdo...');
+            const mainContent = document.getElementById('mainContent');
+            mainContent.innerHTML = '';
+
+            const currentMonth = getCurrentMonth();
+            const months = Object.keys(readingPlan);
+
+            for (const month of months) {
+                const section = document.createElement('div');
+                section.className = 'month-section';
+                section.id = `month-${month}`;
+
+                const savedState = localStorage.getItem(`month-${month}`);
+                const shouldBeOpen = savedState ? savedState === 'open' : month === currentMonth;
+
+                if (!shouldBeOpen) {
+                    section.classList.add('collapsed');
+                }
+
+                // Header
+                const header = document.createElement('div');
+                header.className = 'month-header';
+                header.onclick = () => toggleMonth(month);
+
+                const titleWrapper = document.createElement('div');
+                titleWrapper.className = 'month-title-wrapper';
+
+                const icon = document.createElement('span');
+                icon.className = 'month-toggle-icon';
+                icon.textContent = '▼';
+
+                const title = document.createElement('h2');
+                title.className = 'month-title';
+                title.textContent = month;
+
+                titleWrapper.appendChild(icon);
+                titleWrapper.appendChild(title);
+
+                const progress = document.createElement('div');
+                progress.className = 'month-progress';
+                progress.id = `progress-${month}`;
+                progress.textContent = '0/0 (0%)';
+
+                header.appendChild(titleWrapper);
+                header.appendChild(progress);
+
+                // Content
+                const content = document.createElement('div');
+                content.className = 'month-content';
+
+                const grid = document.createElement('div');
+                grid.className = 'cards-grid';
+
+                const days = readingPlan[month];
+                for (const day of days) {
+                    grid.appendChild(createCard(day));
+                }
+
+                content.appendChild(grid);
+                section.appendChild(header);
+                section.appendChild(content);
+                mainContent.appendChild(section);
+            }
+
+            updateProgress();
+            console.log('✅ Conteúdo gerado!');
+        }
+
+        // Inicialização
+        window.addEventListener('load', () => {
+            console.log('✅ Página carregada');
+            loadTheme();
+            generateContent();
+            console.log('✅ App pronto!');
+        });
+    </script>
+</body>
+</html>
